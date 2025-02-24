@@ -1,7 +1,7 @@
 [
   {
     "__type__": "cc.Prefab",
-    "_name": "Shape1",
+    "_name": "Shape8",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_native": "",
@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "Shape1",
+    "_name": "Shape8",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": null,
@@ -85,22 +85,22 @@
   },
   {
     "__type__": "cc.CompPrefabInfo",
-    "fileId": "fcZaljfOlPr5p69f939+IZ"
+    "fileId": "47O07TFHlGrIt3cGPIQgJd"
   },
   {
     "__type__": "Row",
     "column": [
       true,
-      false,
-      false
+      true,
+      true
     ]
   },
   {
     "__type__": "Row",
     "column": [
       true,
-      false,
-      false
+      true,
+      true
     ]
   },
   {
@@ -119,7 +119,7 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "ab+aMFupNJCazQS9eI5VgL",
+    "fileId": "c46/YsCPVOJYA4mWEpNYRx",
     "instance": null,
     "targetOverrides": null
   }

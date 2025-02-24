@@ -1,7 +1,7 @@
 [
   {
     "__type__": "cc.Prefab",
-    "_name": "Shape1",
+    "_name": "Shape4",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_native": "",
@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "Shape1",
+    "_name": "Shape4",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": null,
@@ -25,7 +25,7 @@
       }
     ],
     "_prefab": {
-      "__id__": 7
+      "__id__": 8
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -68,8 +68,8 @@
     "__prefab": {
       "__id__": 3
     },
-    "columns": 3,
-    "rows": 3,
+    "columns": 1,
+    "rows": 4,
     "board": [
       {
         "__id__": 4
@@ -79,35 +79,38 @@
       },
       {
         "__id__": 6
+      },
+      {
+        "__id__": 7
       }
     ],
     "_id": ""
   },
   {
     "__type__": "cc.CompPrefabInfo",
-    "fileId": "fcZaljfOlPr5p69f939+IZ"
+    "fileId": "4exonmSpFAy777frmsj0cZ"
   },
   {
     "__type__": "Row",
     "column": [
-      true,
-      false,
-      false
+      true
     ]
   },
   {
     "__type__": "Row",
     "column": [
-      true,
-      false,
-      false
+      true
     ]
   },
   {
     "__type__": "Row",
     "column": [
-      true,
-      true,
+      true
+    ]
+  },
+  {
+    "__type__": "Row",
+    "column": [
       true
     ]
   },
@@ -119,7 +122,7 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "ab+aMFupNJCazQS9eI5VgL",
+    "fileId": "c46/YsCPVOJYA4mWEpNYRx",
     "instance": null,
     "targetOverrides": null
   }
