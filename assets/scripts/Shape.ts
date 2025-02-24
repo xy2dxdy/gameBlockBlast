@@ -1,4 +1,4 @@
-import { _decorator, Component, instantiate, Node, Prefab, Sprite, UITransform, Vec2, Vec3 } from 'cc';
+import { _decorator, Canvas, Component, EventMouse, EventTouch, instantiate, Node, Prefab, Sprite, UITransform, Vec2, Vec3 } from 'cc';
 import { ShapeData } from './ShapeData';
 const { ccclass, property } = _decorator;
 
@@ -6,19 +6,38 @@ const { ccclass, property } = _decorator;
 export class Shape extends Component {
     @property(Prefab)
     prefabSquareShapeImage: Prefab = null;
+    @property(Vec3)
+    shapeSelectedScale: Vec3 = null;
+
 
 
     private squareShapeImage: Node = null;
     private shapeData: ShapeData = null;
     private currentShape: Node[] = [];
 
+    shapeStartScale: Vec2 = null;
+    canvas: Canvas = null;
+    shapeDraggable: Boolean = true;
+
+
     onLoad(){
         this.squareShapeImage = instantiate(this.prefabSquareShapeImage) as Node;
+        this.shapeStartScale = this.node.scale.toVec2();
+        console.log(this.shapeStartScale);
+        this.canvas = this.node.getParent().getComponent(Canvas);
+        this.shapeDraggable = true;
+
+        this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
+        this.node.on(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
+        this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
+
     }
 
     RequestNewShape(shapeData: ShapeData){
         this.CreateShape(shapeData);
     }
+
+
 
     CreateShape(shapeData: ShapeData){
         this.shapeData = shapeData;
@@ -84,6 +103,24 @@ export class Shape extends Component {
             shiftOnX = startXPos + column * moveDistance.x;
         }
         return shiftOnX;
+    }
+
+    onTouchStart(event: EventTouch) {
+        console.log("start");
+        this.node.scale = this.shapeSelectedScale;
+    }
+
+    onTouchMove(event: EventTouch) {
+        let pos: Vec2;
+        let delta = event.getDelta();
+        this.node.position = this.node.position.add(new Vec3(delta.x, delta.y, 0));
+    }
+
+    onTouchEnd(event: EventTouch) {
+        console.log("end");
+        console.log(this.node.scale);
+        console.log(this.shapeStartScale);
+        this.node.scale = new Vec3 (this.shapeStartScale.x, this.shapeStartScale.y, 1);
     }
 }
 

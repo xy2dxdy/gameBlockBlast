@@ -103,6 +103,12 @@
       "__uuid__": "5f99a4cc-382d-4e28-afb2-ab166aa063b0",
       "__expectedType__": "cc.Prefab"
     },
+    "shapeSelectedScale": {
+      "__type__": "cc.Vec3",
+      "x": 0.8,
+      "y": 0.8,
+      "z": 0.8
+    },
     "_id": ""
   },
   {
