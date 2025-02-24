@@ -401,7 +401,6 @@
     "__prefab": null,
     "columns": 8,
     "rows": 8,
-    "squareGap": 6,
     "gridSquare": {
       "__uuid__": "8bbd33bb-d3ab-448f-9edb-076040031667",
       "__expectedType__": "cc.Prefab"
