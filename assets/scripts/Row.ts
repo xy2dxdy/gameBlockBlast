@@ -3,7 +3,7 @@ const { ccclass, property } = _decorator;
 
 @ccclass('Row')
 export class Row{
-    @property(Boolean)
+    @property([Boolean])
     column: Boolean[] = [];
     private size: number = 0;
     Row(size: number){
