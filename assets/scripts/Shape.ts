@@ -1,6 +1,6 @@
 import { _decorator, Canvas, Collider2D, Component, EventMouse, EventTouch, instantiate, Node, Prefab, Sprite, UITransform, Vec2, Vec3 } from 'cc';
 import { ShapeData } from './ShapeData';
-import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED, MOVE_SHAPE_TO_START_POSITION } from './GameEvents';
+import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED, MOVE_SHAPE_TO_START_POSITION, SET_SHAPE_INACTIVE } from './GameEvents';
 import { ShapeSquare } from './ShapeSquare';
 const { ccclass, property } = _decorator;
 
@@ -46,9 +46,11 @@ export class Shape extends Component {
     }
     onEnable() {
         GameEvents.on(MOVE_SHAPE_TO_START_POSITION, this.moveShapeToStartPosition, this);
+        GameEvents.on(SET_SHAPE_INACTIVE, this.SetShapeInactive, this);
     }
     onDisable(){
         GameEvents.off(MOVE_SHAPE_TO_START_POSITION, this.moveShapeToStartPosition, this);
+        GameEvents.on(SET_SHAPE_INACTIVE, this.SetShapeInactive, this);
     }
     IsOnStartPosition(): boolean{
         return this.node.position.equals(this.startPosition);
@@ -62,10 +64,19 @@ export class Shape extends Component {
         return false;
     }
 
+    SetShapeInactive(){
+        if(this.IsOnStartPosition() == false && this.IsAnyOfShapeSquareActive()){
+            this.currentShape.forEach(shape => {
+                shape.active = false;
+            });
+        }
+    }
+
     DeactivateShape(){
         if(this.shapeActive){
             this.currentShape.forEach(square => {
-                square.getComponent(ShapeSquare).DeactivateShape();
+                square?.getComponent(ShapeSquare).DeactivateShape();
+                //square.destroy();
             });
         }
         this.shapeActive = false;
@@ -74,7 +85,7 @@ export class Shape extends Component {
     ActivateShape(){
         if(!this.shapeActive){
             this.currentShape.forEach(square => {
-                square.getComponent(ShapeSquare).ActivateShape();
+                square?.getComponent(ShapeSquare).ActivateShape();
             });
         }
         this.shapeActive = true;
@@ -88,6 +99,7 @@ export class Shape extends Component {
 
 
     CreateShape(shapeData: ShapeData){
+       //this.node.position = this.startPosition;
         this.shapeData = shapeData;
         this.TotalSquareNumber = this.getNumberOfSquares(shapeData);
         while(this.currentShape.length < this.TotalSquareNumber){
@@ -97,6 +109,7 @@ export class Shape extends Component {
         
         this.currentShape.forEach(square => {
             square.position = new Vec3(0, 0, 0);
+            square.active = false;
         });
         let squareUI = this.squareShapeImage.getComponent(UITransform);
         let moveDistance = new Vec2(squareUI.width * this.squareShapeImage.scale.x, squareUI.height * this.squareShapeImage.scale.y);
@@ -106,7 +119,7 @@ export class Shape extends Component {
             for(let col = 0; col < shapeData.columns; col++){
                 if(shapeData.board[row].column[col]){
                     this.currentShape[currentIndexInList].position = new Vec3(this.getXPositionForShapeSquare(shapeData, col, moveDistance), this.getYPositionForShapeSquare(shapeData, row, moveDistance));
-                    
+                    this.currentShape[currentIndexInList].active = true;
                     currentIndexInList++;
                 }
             }

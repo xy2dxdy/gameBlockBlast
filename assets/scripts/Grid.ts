@@ -1,6 +1,6 @@
 import { _decorator, Component, instantiate, Node, Prefab, Rect, UITransform, Vec2, Vec3 } from 'cc';
 import { GridSquare } from './GridSquare';
-import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED, MOVE_SHAPE_TO_START_POSITION } from './GameEvents';
+import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED, MOVE_SHAPE_TO_START_POSITION, REQUEST_NEW_SHAPES, SET_SHAPE_INACTIVE } from './GameEvents';
 import { ShapeStorage } from './ShapeStorage';
 import { Shape } from './Shape';
 
@@ -94,7 +94,18 @@ export class Grid extends Component {
             squareIndexes.forEach(squareIndex => {
                 this.gridSquares[squareIndex].PlaceShapeOnBoard();
             });
-            currentSelectedShape.DeactivateShape();
+
+            let shapeLeft: number = 0;
+            this.shapeStorage.shapeList.forEach(shape => {
+                if(shape.IsAnyOfShapeSquareActive() && shape.IsOnStartPosition()){
+                    shapeLeft++;
+                }
+            });
+            if(shapeLeft == 0){
+                GameEvents.emit(REQUEST_NEW_SHAPES);
+            }else{
+                GameEvents.emit(SET_SHAPE_INACTIVE);
+            }
         } else{
             GameEvents.emit(MOVE_SHAPE_TO_START_POSITION);
         }
