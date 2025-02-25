@@ -1,11 +1,14 @@
 import { _decorator, Component, instantiate, Node, Prefab, Rect, UITransform, Vec2, Vec3 } from 'cc';
 import { GridSquare } from './GridSquare';
 import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED } from './GameEvents';
+import { ShapeStorage } from './ShapeStorage';
 
 const { ccclass, property } = _decorator;
 
 @ccclass('Grid')
 export class Grid extends Component {
+    @property(ShapeStorage)
+    shapeStorage: ShapeStorage;
     @property
     columns: number = 8;
     @property
@@ -76,6 +79,7 @@ export class Grid extends Component {
                 gridSquare.ActivateSquare();
             }
         });
+        this.shapeStorage.GetCurrentSelectedShape().DeactivateShape();
     }
 }
 

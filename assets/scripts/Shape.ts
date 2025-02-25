@@ -1,6 +1,7 @@
 import { _decorator, Canvas, Collider2D, Component, EventMouse, EventTouch, instantiate, Node, Prefab, Sprite, UITransform, Vec2, Vec3 } from 'cc';
 import { ShapeData } from './ShapeData';
 import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED } from './GameEvents';
+import { ShapeSquare } from './ShapeSquare';
 const { ccclass, property } = _decorator;
 
 @ccclass('Shape')
@@ -20,6 +21,10 @@ export class Shape extends Component {
     shapeStartScale: Vec2 = null;
     canvas: Canvas = null;
     shapeDraggable: Boolean = true;
+    @property(Vec3)
+    startPosition: Vec3 = null;
+    shapeActive: boolean = true;
+
 
     
 
@@ -29,6 +34,8 @@ export class Shape extends Component {
         console.log(this.shapeStartScale);
         this.canvas = this.node.getParent().getComponent(Canvas);
         this.shapeDraggable = true;
+        this.startPosition = new Vec3(this.node.position);
+        this.shapeActive = true;
 
         this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
         this.node.on(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
@@ -36,10 +43,38 @@ export class Shape extends Component {
 
 
     }
+    IsOnStartPosition(): boolean{
+        return this.node.position.equals(this.startPosition);
+    }
+    IsAnyOfShapeSquareActive(): boolean{
+        for (const square of this.currentShape) {
+            if(square.active){
+                return true;
+            }   
+        }
+        return false;
+    }
 
-    
+    DeactivateShape(){
+        if(this.shapeActive){
+            this.currentShape.forEach(square => {
+                square.getComponent(ShapeSquare).DeactivateShape();
+            });
+        }
+        this.shapeActive = false;
+    }
+
+    ActivateShape(){
+        if(!this.shapeActive){
+            this.currentShape.forEach(square => {
+                square.getComponent(ShapeSquare).ActivateShape();
+            });
+        }
+        this.shapeActive = true;
+    }
 
     RequestNewShape(shapeData: ShapeData){
+        this.node.setPosition(this.startPosition);
         this.CreateShape(shapeData);
     }
 

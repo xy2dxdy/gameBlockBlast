@@ -7,8 +7,8 @@ const { ccclass, property } = _decorator;
 export class ShapeStorage extends Component {
     @property([Prefab])
     prefabShapeData: Prefab[] = [];
-    @property([Node])
-    shapeList: Node[] = [];
+    @property([Shape])
+    shapeList: Shape[] = [];
 
     private shapeData: ShapeData[] = [];
 
@@ -17,11 +17,20 @@ export class ShapeStorage extends Component {
             this.shapeData.push(instantiate(element).getComponent(ShapeData));
             
         });
-        console.log(this.shapeData.length);
         this.shapeList.forEach(element => {
             let shapeIndex = randomRangeInt(0, this.shapeData.length);
-            element.getComponent(Shape).CreateShape(this.shapeData[shapeIndex]);
+            element.CreateShape(this.shapeData[shapeIndex]);
         });
+    }
+
+    GetCurrentSelectedShape(): Shape{
+        for (const shape of this.shapeList) {
+            if(shape.IsOnStartPosition() == false && shape.IsAnyOfShapeSquareActive()){
+                return shape;
+            }
+        }
+        console.error("There is no shape selected!");
+        return null;
     }
 
     
