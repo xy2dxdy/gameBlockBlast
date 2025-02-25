@@ -1,5 +1,7 @@
 import { _decorator, Component, instantiate, Node, Prefab, Rect, UITransform, Vec2, Vec3 } from 'cc';
 import { GridSquare } from './GridSquare';
+import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED } from './GameEvents';
+
 const { ccclass, property } = _decorator;
 
 @ccclass('Grid')
@@ -19,7 +21,12 @@ export class Grid extends Component {
 
     private offset: Vec2 = new Vec2(0, 0);
     private gridSquares: Node[] = [];
-
+    onEnable() {
+        GameEvents.on(CHECK_IF_SHAPE_CAN_BE_PLACED, this.onCheckIfShapeCanBePlaced, this);
+    }
+    onDisable(){
+        GameEvents.off(CHECK_IF_SHAPE_CAN_BE_PLACED, this.onCheckIfShapeCanBePlaced, this);
+    }
     start(){
         this.CreateGrid();
     }
@@ -60,6 +67,15 @@ export class Grid extends Component {
             column_number++;
         });
 
+    }
+
+    onCheckIfShapeCanBePlaced(){
+        this.gridSquares.forEach(square => {
+            let gridSquare = square.getComponent(GridSquare);
+            if(gridSquare.CanWeUseThisSquare()){
+                gridSquare.ActivateSquare();
+            }
+        });
     }
 }
 

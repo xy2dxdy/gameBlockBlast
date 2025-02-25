@@ -1,5 +1,6 @@
-import { _decorator, Canvas, Component, EventMouse, EventTouch, instantiate, Node, Prefab, Sprite, UITransform, Vec2, Vec3 } from 'cc';
+import { _decorator, Canvas, Collider2D, Component, EventMouse, EventTouch, instantiate, Node, Prefab, Sprite, UITransform, Vec2, Vec3 } from 'cc';
 import { ShapeData } from './ShapeData';
+import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED } from './GameEvents';
 const { ccclass, property } = _decorator;
 
 @ccclass('Shape')
@@ -8,7 +9,8 @@ export class Shape extends Component {
     prefabSquareShapeImage: Prefab = null;
     @property(Vec3)
     shapeSelectedScale: Vec3 = null;
-
+    @property(Vec3)
+    offset: Vec3 = new Vec3(0, 700, 0);
 
 
     private squareShapeImage: Node = null;
@@ -19,6 +21,7 @@ export class Shape extends Component {
     canvas: Canvas = null;
     shapeDraggable: Boolean = true;
 
+    
 
     onLoad(){
         this.squareShapeImage = instantiate(this.prefabSquareShapeImage) as Node;
@@ -31,7 +34,10 @@ export class Shape extends Component {
         this.node.on(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
 
+
     }
+
+    
 
     RequestNewShape(shapeData: ShapeData){
         this.CreateShape(shapeData);
@@ -111,16 +117,15 @@ export class Shape extends Component {
     }
 
     onTouchMove(event: EventTouch) {
-        let pos: Vec2;
-        let delta = event.getDelta();
-        this.node.position = this.node.position.add(new Vec3(delta.x, delta.y, 0));
+        if (this.shapeDraggable) {
+            let delta = event.getDelta();
+            this.node.position = this.node.position.add(new Vec3(delta.x, delta.y, 0));
+        }
     }
 
     onTouchEnd(event: EventTouch) {
-        console.log("end");
-        console.log(this.node.scale);
-        console.log(this.shapeStartScale);
         this.node.scale = new Vec3 (this.shapeStartScale.x, this.shapeStartScale.y, 1);
+        GameEvents.emit(CHECK_IF_SHAPE_CAN_BE_PLACED);
     }
 }
 
