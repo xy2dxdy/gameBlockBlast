@@ -26,6 +26,10 @@ D
         }
     }
 
+    PlaceShapeOnBoard(){
+        this.ActivateSquare();
+    }
+
     public CanWeUseThisSquare(): boolean {
             return this.hooverImage.node.active;
     }
@@ -38,14 +42,18 @@ D
     }
 
     onBeginContact(selfCollider: BoxCollider2D, otherCollider: BoxCollider2D, contact: IPhysics2DContact | null) {
-        this.hooverImage.node.active = true;
-
+        if(!this.SquareOccupied){
+            this.Selected = true;
+            this.hooverImage.node.active = true;
+        }
 
     }
 
     onEndContact(selfCollider: BoxCollider2D, otherCollider: BoxCollider2D, contact: IPhysics2DContact | null) {
-        this.hooverImage.node.active = false;
-
+        if(!this.SquareOccupied){
+            this.Selected = false;
+             this.hooverImage.node.active = false;
+        }
     }
 
 }

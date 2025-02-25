@@ -1,6 +1,6 @@
 import { _decorator, Canvas, Collider2D, Component, EventMouse, EventTouch, instantiate, Node, Prefab, Sprite, UITransform, Vec2, Vec3 } from 'cc';
 import { ShapeData } from './ShapeData';
-import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED } from './GameEvents';
+import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED, MOVE_SHAPE_TO_START_POSITION } from './GameEvents';
 import { ShapeSquare } from './ShapeSquare';
 const { ccclass, property } = _decorator;
 
@@ -17,6 +17,7 @@ export class Shape extends Component {
     private squareShapeImage: Node = null;
     private shapeData: ShapeData = null;
     private currentShape: Node[] = [];
+    TotalSquareNumber: number;
 
     shapeStartScale: Vec2 = null;
     canvas: Canvas = null;
@@ -42,6 +43,12 @@ export class Shape extends Component {
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
 
 
+    }
+    onEnable() {
+        GameEvents.on(MOVE_SHAPE_TO_START_POSITION, this.moveShapeToStartPosition, this);
+    }
+    onDisable(){
+        GameEvents.off(MOVE_SHAPE_TO_START_POSITION, this.moveShapeToStartPosition, this);
     }
     IsOnStartPosition(): boolean{
         return this.node.position.equals(this.startPosition);
@@ -82,8 +89,8 @@ export class Shape extends Component {
 
     CreateShape(shapeData: ShapeData){
         this.shapeData = shapeData;
-        let totalSquareNumber: number = this.getNumberOfSquares(shapeData);
-        while(this.currentShape.length < totalSquareNumber){
+        this.TotalSquareNumber = this.getNumberOfSquares(shapeData);
+        while(this.currentShape.length < this.TotalSquareNumber){
             this.currentShape.push(instantiate(this.squareShapeImage));
             this.currentShape[this.currentShape.length - 1].setParent(this.node);
         }
@@ -161,6 +168,9 @@ export class Shape extends Component {
     onTouchEnd(event: EventTouch) {
         this.node.scale = new Vec3 (this.shapeStartScale.x, this.shapeStartScale.y, 1);
         GameEvents.emit(CHECK_IF_SHAPE_CAN_BE_PLACED);
+    }
+    moveShapeToStartPosition(){
+        this.node.position = new Vec3(this.startPosition);
     }
 }
 
