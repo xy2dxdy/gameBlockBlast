@@ -3,6 +3,7 @@ import { GridSquare } from './GridSquare';
 import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED, MOVE_SHAPE_TO_START_POSITION, REQUEST_NEW_SHAPES, SET_SHAPE_INACTIVE } from './GameEvents';
 import { ShapeStorage } from './ShapeStorage';
 import { Shape } from './Shape';
+import { LineIndicator } from './LineIndicator';
 
 const { ccclass, property } = _decorator;
 
@@ -25,6 +26,8 @@ export class Grid extends Component {
 
     private offset: Vec2 = new Vec2(0, 0);
     private gridSquares: GridSquare[] = [];
+    private lineIndicator: LineIndicator;
+
     onEnable() {
         GameEvents.on(CHECK_IF_SHAPE_CAN_BE_PLACED, this.onCheckIfShapeCanBePlaced, this);
     }
@@ -33,6 +36,8 @@ export class Grid extends Component {
     }
     start(){
         this.CreateGrid();
+        this.lineIndicator = this.getComponent(LineIndicator);
+        console.log(this.lineIndicator);
     }
 
     CreateGrid(){
@@ -106,9 +111,61 @@ export class Grid extends Component {
             }else{
                 GameEvents.emit(SET_SHAPE_INACTIVE);
             }
+            this.CheckIfAnyLineIsCompleted();
         } else{
             GameEvents.emit(MOVE_SHAPE_TO_START_POSITION);
         }
+    }
+    CheckIfAnyLineIsCompleted(){
+        let lines: number[][] = [];
+        this.lineIndicator.column_indexes.forEach(column => {
+            lines.push(this.lineIndicator.GetVerticalLines(column));
+        });
+        for(let row = 0; row < 8; row++){
+            let data: number[] = [];
+            for(let col = 0; col < 8; col++){
+                data.push(this.lineIndicator.line_data[row][col]);
+            }
+            lines.push(data);
+        }
+        let completedLines: number = this.CheckIfSquareAreCompleted(lines);
+        if(completedLines > 2){
+
+        }
+
+    }
+    CheckIfSquareAreCompleted(data: number[][]): number{
+        let completedLines: number[][] = [];
+        let linesCompleted = 0;
+
+        data.forEach(line => {
+            let lineCompleted = true;
+            line.forEach(squareIndex => {
+                let comp = this.gridSquares[squareIndex].getComponent(GridSquare);
+                if(comp.SquareOccupied == false){
+                    lineCompleted = false;
+                }
+            });
+            if(lineCompleted){
+                completedLines.push(line);
+            }
+        });
+        completedLines.forEach(line => {
+            let completed = false;
+            line.forEach(squareIndex => {
+                let comp:GridSquare = this.gridSquares[squareIndex];
+                comp.Deactivate();
+                completed = true;
+            });
+            line.forEach(squareIndex => {
+                let comp:GridSquare = this.gridSquares[squareIndex];
+                comp.ClearOccupied();
+            });
+            if(completed){
+                linesCompleted++;
+            }
+        });
+        return linesCompleted;
     }
 }
 

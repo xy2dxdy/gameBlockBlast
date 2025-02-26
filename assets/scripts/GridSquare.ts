@@ -40,6 +40,13 @@ D
         this.Selected = true;
         this.SquareOccupied = true;
     }
+    public Deactivate(): void{
+        this.activeImage.node.active = false;
+    }
+    public ClearOccupied(){
+        this.Selected = false;
+        this.SquareOccupied = false;
+    }
 
     onBeginContact(selfCollider: BoxCollider2D, otherCollider: BoxCollider2D, contact: IPhysics2DContact | null) {
         if(!this.SquareOccupied){
