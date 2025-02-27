@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, UI, Sprite, Collider2D, Contact2DType, IPhysics2DContact, Prefab, BoxCollider2D as BoxCollider2D, PolygonCollider2D, SpriteFrame } from 'cc';
+import { _decorator, Component, Node, UI, Sprite, Collider2D, Contact2DType, Animation, IPhysics2DContact, Prefab, BoxCollider2D as BoxCollider2D, PolygonCollider2D, SpriteFrame, AnimationComponent, Vec2, Vec3 } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('GridSquare')
@@ -11,6 +11,8 @@ export class GridSquare extends Component {
     @property(Sprite)
     activeImage: Sprite = null;
 
+    private animation: Animation = null;
+
     Selected: Boolean;
     SquareIndex : number;
     SquareOccupied: Boolean;
@@ -19,10 +21,14 @@ D
         this.Selected = false;
         this.SquareOccupied = false;
         let collider = this.getComponent(BoxCollider2D);
+        this.animation = this.activeImage.getComponent(Animation);
         
         if (collider) {
             collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
             collider.on(Contact2DType.END_CONTACT, this.onEndContact, this);
+        }
+        if (this.animation) {
+            this.animation.on(Animation.EventType.FINISHED, this.onAnimationFinished, this);
         }
     }
 
@@ -42,7 +48,10 @@ D
         this.SquareOccupied = true;
     }
     public Deactivate(): void{
-        this.activeImage.node.active = false;
+        if (this.animation) {
+            this.animation.play('ScaleAnimation');
+        }
+        
     }
     public ClearOccupied(){
         this.Selected = false;
@@ -62,6 +71,10 @@ D
             this.Selected = false;
              this.hooverImage.node.active = false;
         }
+    }
+    onAnimationFinished() {
+        this.activeImage.node.active = false;
+        this.activeImage.node.scale = new Vec3(1, 1, 1);
     }
 
 }

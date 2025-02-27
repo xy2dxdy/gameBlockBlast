@@ -129,9 +129,7 @@ export class Grid extends Component {
             lines.push(data);
         }
         let completedLines: number = this.CheckIfSquareAreCompleted(lines);
-        if(completedLines > 2){
-
-        }
+ 
         let totalScore: number = 10 * completedLines;
         triggerAddScore(totalScore);
         this.CheckIsPlayerLost();
