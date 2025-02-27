@@ -1,6 +1,6 @@
-import { _decorator, Component, instantiate, Node, Prefab, Rect, UITransform, Vec2, Vec3 } from 'cc';
+import { _decorator, Component, instantiate, Node, Prefab, Rect, Sprite, UITransform, Vec2, Vec3 } from 'cc';
 import { GridSquare } from './GridSquare';
-import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED, MOVE_SHAPE_TO_START_POSITION, REQUEST_NEW_SHAPES, SET_SHAPE_INACTIVE } from './GameEvents';
+import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED, MOVE_SHAPE_TO_START_POSITION, REQUEST_NEW_SHAPES, SET_SHAPE_INACTIVE, triggerAddScore, GAME_OVER, triggerGameOver } from './GameEvents';
 import { ShapeStorage } from './ShapeStorage';
 import { Shape } from './Shape';
 import { LineIndicator } from './LineIndicator';
@@ -97,7 +97,7 @@ export class Grid extends Component {
 
         if(currentSelectedShape.TotalSquareNumber == squareIndexes.length){
             squareIndexes.forEach(squareIndex => {
-                this.gridSquares[squareIndex].PlaceShapeOnBoard();
+                this.gridSquares[squareIndex].PlaceShapeOnBoard(currentSelectedShape.squareShapeImage.getComponent(Sprite).spriteFrame);
             });
 
             let shapeLeft: number = 0;
@@ -132,7 +132,9 @@ export class Grid extends Component {
         if(completedLines > 2){
 
         }
-
+        let totalScore: number = 10 * completedLines;
+        triggerAddScore(totalScore);
+        this.CheckIsPlayerLost();
     }
     CheckIfSquareAreCompleted(data: number[][]): number{
         let completedLines: number[][] = [];
@@ -167,6 +169,92 @@ export class Grid extends Component {
         });
         return linesCompleted;
     }
+    private CheckIsPlayerLost(){
+        let validShapes: number = 0;
+
+        for(let index = 0; index < this.shapeStorage.shapeList.length; index++){
+            let isShapeActive: boolean = this.shapeStorage.shapeList[index].IsAnyOfShapeSquareActive();
+            if(this.CheckIfShapeCanBePlacedOnGrid(this.shapeStorage.shapeList[index]) && isShapeActive){
+                this.shapeStorage.shapeList[index]?.ActivateShape();
+                validShapes++;
+            }
+        }
+        if(validShapes == 0){
+            triggerGameOver(false);
+            console.log("GAME OVER");
+        }
+    }
+    private CheckIfShapeCanBePlacedOnGrid(currentShape: Shape): boolean{
+        let currentShapeData = currentShape.shapeData;
+        let shapeColumns: number = currentShapeData.columns;
+        let shapeRows: number = currentShapeData.rows;
+       // console.log(shapeColumns + " " + shapeRows);
+
+        let originalShapeFilledUpSquares: number[] = [];
+        let squareIndex: number = 0;
+
+        for(let rowIndex = 0; rowIndex < shapeRows; rowIndex++){
+            for(let columnIndex = 0; columnIndex < shapeColumns; columnIndex++){
+                //console.log(currentShapeData.board);
+                if(currentShapeData.board[rowIndex].column[columnIndex]){
+                    originalShapeFilledUpSquares.push(squareIndex);
+                }
+                squareIndex++;
+            }
+        }
+        //console.log(currentShape.TotalSquareNumber);
+       // console.log(originalShapeFilledUpSquares.length);
+        if(currentShape.TotalSquareNumber != originalShapeFilledUpSquares.length){
+            console.error("Number of filled up squares are not the same at the original shape have");
+        }
+
+        let squareList = this.GetAllSquareCombination(shapeColumns, shapeRows);
+        let canBePlaced:boolean = false;
+
+        squareList.forEach(number => {
+            let shapeCanBePlacedOnBoard: boolean = true;
+            originalShapeFilledUpSquares.forEach(squareIndexToCheck => {
+                let comp = this.gridSquares[number[squareIndexToCheck]].getComponent(GridSquare);
+                if(comp.SquareOccupied){
+                    shapeCanBePlacedOnBoard = false;
+                }
+            });
+            if(shapeCanBePlacedOnBoard){
+                canBePlaced = true;
+            }
+        });
+        return canBePlaced; 
+    }
+
+    GetAllSquareCombination(columns: number, rows: number): number[][]{
+        let squareList: number[][] = [];
+        let lastColumnIndex: number = 0;
+        let lastRowIndex: number = 0;
+
+        let safeIndex = 0;
+
+        while(lastRowIndex + (rows - 1) < 8){
+            let rowData: number[] = [];
+            for(let row = lastRowIndex; row < lastRowIndex + rows; row++){
+                for(let column = lastColumnIndex; column < lastColumnIndex + columns; column++){
+                    rowData.push(this.lineIndicator.line_data[row][column]);
+                }
+            }
+            squareList.push(rowData);
+            lastColumnIndex++;
+            if(lastColumnIndex + (columns - 1) >= 8){
+                lastRowIndex++;
+                lastColumnIndex = 0;
+            }
+            safeIndex++;
+            if(safeIndex > 100){
+                break;
+            }
+        }
+        return squareList;
+    }
+
+
 }
 
 

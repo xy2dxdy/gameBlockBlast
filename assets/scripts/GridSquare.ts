@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, UI, Sprite, Collider2D, Contact2DType, IPhysics2DContact, Prefab, BoxCollider2D as BoxCollider2D, PolygonCollider2D } from 'cc';
+import { _decorator, Component, Node, UI, Sprite, Collider2D, Contact2DType, IPhysics2DContact, Prefab, BoxCollider2D as BoxCollider2D, PolygonCollider2D, SpriteFrame } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('GridSquare')
@@ -26,16 +26,17 @@ D
         }
     }
 
-    PlaceShapeOnBoard(){
-        this.ActivateSquare();
+    PlaceShapeOnBoard(image: SpriteFrame){
+        this.ActivateSquare(image);
     }
 
     public CanWeUseThisSquare(): boolean {
             return this.hooverImage.node.active;
     }
 
-    public ActivateSquare(): void{
+    public ActivateSquare(image: SpriteFrame): void{
         this.hooverImage.node.active = false;
+        this.activeImage.spriteFrame = image;
         this.activeImage.node.active = true;
         this.Selected = true;
         this.SquareOccupied = true;

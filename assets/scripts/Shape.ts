@@ -1,4 +1,4 @@
-import { _decorator, Canvas, Collider2D, Component, EventMouse, EventTouch, instantiate, Node, Prefab, Sprite, UITransform, Vec2, Vec3 } from 'cc';
+import { _decorator, Canvas, Collider2D, Component, EventMouse, EventTouch, instantiate, Node, Prefab, randomRangeInt, Sprite, SpriteFrame, Texture2D, UITransform, Vec2, Vec3 } from 'cc';
 import { ShapeData } from './ShapeData';
 import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED, MOVE_SHAPE_TO_START_POSITION, SET_SHAPE_INACTIVE } from './GameEvents';
 import { ShapeSquare } from './ShapeSquare';
@@ -12,10 +12,13 @@ export class Shape extends Component {
     shapeSelectedScale: Vec3 = null;
     @property(Vec3)
     offset: Vec3 = new Vec3(0, 700, 0);
+    @property([SpriteFrame])
+    spriteFrames: SpriteFrame[] = [];
 
 
-    private squareShapeImage: Node = null;
-    private shapeData: ShapeData = null;
+
+    squareShapeImage: Node = null;
+    shapeData: ShapeData = null;
     private currentShape: Node[] = [];
     TotalSquareNumber: number;
 
@@ -32,11 +35,11 @@ export class Shape extends Component {
     onLoad(){
         this.squareShapeImage = instantiate(this.prefabSquareShapeImage) as Node;
         this.shapeStartScale = this.node.scale.toVec2();
-        console.log(this.shapeStartScale);
         this.canvas = this.node.getParent().getComponent(Canvas);
         this.shapeDraggable = true;
         this.startPosition = new Vec3(this.node.position);
         this.shapeActive = true;
+
 
         this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
         this.node.on(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
@@ -63,6 +66,7 @@ export class Shape extends Component {
         }
         return false;
     }
+
 
     SetShapeInactive(){
         if(this.IsOnStartPosition() == false && this.IsAnyOfShapeSquareActive()){
@@ -100,8 +104,14 @@ export class Shape extends Component {
 
     CreateShape(shapeData: ShapeData){
        //this.node.position = this.startPosition;
+       let spriteIndex: number = randomRangeInt(0, this.spriteFrames.length);
+       this.squareShapeImage.getComponent(Sprite).spriteFrame = this.spriteFrames[spriteIndex];
+
         this.shapeData = shapeData;
         this.TotalSquareNumber = this.getNumberOfSquares(shapeData);
+        this.currentShape.forEach(element => {
+            element.getComponent(Sprite).spriteFrame = this.squareShapeImage.getComponent(Sprite).spriteFrame;
+        });
         while(this.currentShape.length < this.TotalSquareNumber){
             this.currentShape.push(instantiate(this.squareShapeImage));
             this.currentShape[this.currentShape.length - 1].setParent(this.node);
@@ -118,6 +128,7 @@ export class Shape extends Component {
         for(let row = 0; row < shapeData.rows; row++){
             for(let col = 0; col < shapeData.columns; col++){
                 if(shapeData.board[row].column[col]){
+                    
                     this.currentShape[currentIndexInList].position = new Vec3(this.getXPositionForShapeSquare(shapeData, col, moveDistance), this.getYPositionForShapeSquare(shapeData, row, moveDistance));
                     this.currentShape[currentIndexInList].active = true;
                     currentIndexInList++;

@@ -170,9 +170,9 @@
     "_dstBlendFactor": 4,
     "_color": {
       "__type__": "cc.Color",
-      "r": 58,
-      "g": 41,
-      "b": 29,
+      "r": 30,
+      "g": 22,
+      "b": 37,
       "a": 255
     },
     "_spriteFrame": {
@@ -442,13 +442,13 @@
     "_dstBlendFactor": 4,
     "_color": {
       "__type__": "cc.Color",
-      "r": 87,
-      "g": 158,
-      "b": 21,
+      "r": 255,
+      "g": 255,
+      "b": 255,
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "43b354da-cab4-4a44-9c10-38e44030a395@f9941",
+      "__uuid__": "5eec21a1-585e-4a86-a9a1-226616151fa2@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_type": 0,
