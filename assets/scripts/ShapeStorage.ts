@@ -27,7 +27,10 @@ export class ShapeStorage extends Component {
         this.shapeList.forEach(element => {
             let shapeIndex = randomRangeInt(0, this.shapeData.length);
             element.CreateShape(this.shapeData[shapeIndex]);
+            element.adjustChildrenToCenterOfParent(element.node);
         });
+                
+        
     }
 
     GetCurrentSelectedShape(): Shape{

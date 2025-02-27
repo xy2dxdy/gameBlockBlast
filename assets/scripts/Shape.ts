@@ -41,9 +41,6 @@ export class Shape extends Component {
         this.shapeActive = true;
 
 
-        this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
-        this.node.on(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
-        this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
 
 
     }
@@ -98,6 +95,7 @@ export class Shape extends Component {
     RequestNewShape(shapeData: ShapeData){
         this.node.setPosition(this.startPosition);
         this.CreateShape(shapeData);
+        this.adjustChildrenToCenterOfParent(this.node);
     }
 
 
@@ -177,24 +175,37 @@ export class Shape extends Component {
         return shiftOnX;
     }
 
-    onTouchStart(event: EventTouch) {
-        console.log("start");
-        this.node.scale = this.shapeSelectedScale;
-    }
-
-    onTouchMove(event: EventTouch) {
-        if (this.shapeDraggable) {
-            let delta = event.getDelta();
-            this.node.position = this.node.position.add(new Vec3(delta.x, delta.y, 0));
-        }
-    }
-
-    onTouchEnd(event: EventTouch) {
-        this.node.scale = new Vec3 (this.shapeStartScale.x, this.shapeStartScale.y, 1);
-        GameEvents.emit(CHECK_IF_SHAPE_CAN_BE_PLACED);
-    }
+   
     moveShapeToStartPosition(){
         this.node.position = new Vec3(this.startPosition);
+    }
+
+    adjustChildrenToCenterOfParent(parent: Node) {
+        const children: Node[] = [];
+        parent.children.forEach(child => {
+            if (child.active) {
+                children.push(child);
+            }
+        });
+
+        if (children.length == 0) {
+            return;
+        }
+
+        let center = new Vec3(0, 0, 0);
+        for (const child of children) {
+            center.add(child.position);
+        }
+        center.x /= children.length;
+        center.y /= children.length;
+        center.z /= children.length;
+
+
+        const offset = center.subtract(new Vec3(0, 0, 0));
+        for (const child of children) {
+            const newPosition = child.position.subtract(offset);
+            child.setPosition(newPosition);
+        }
     }
 }
 
