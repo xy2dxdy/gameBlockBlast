@@ -1,4 +1,4 @@
-import { _decorator, Component, instantiate, Node, Prefab, Rect, Sprite, UITransform, Vec2, Vec3 } from 'cc';
+import { _decorator, Component, instantiate, Node, Prefab, Rect, RichText, Sprite, UITransform, Vec2, Vec3 } from 'cc';
 import { GridSquare } from './GridSquare';
 import { GameEvents, CHECK_IF_SHAPE_CAN_BE_PLACED, MOVE_SHAPE_TO_START_POSITION, REQUEST_NEW_SHAPES, SET_SHAPE_INACTIVE, triggerAddScore, GAME_OVER, triggerGameOver } from './GameEvents';
 import { ShapeStorage } from './ShapeStorage';
@@ -23,10 +23,13 @@ export class Grid extends Component {
     startPosition: Vec2 = new Vec2(0, 0);
     @property
     squareScale: number = 0.5;
+    @property(RichText)
+    comboText: RichText = null;
 
     private offset: Vec2 = new Vec2(0, 0);
     private gridSquares: GridSquare[] = [];
     private lineIndicator: LineIndicator;
+    private comboN: number = 0;
 
     onEnable() {
         GameEvents.on(CHECK_IF_SHAPE_CAN_BE_PLACED, this.onCheckIfShapeCanBePlaced, this);
@@ -129,7 +132,18 @@ export class Grid extends Component {
             lines.push(data);
         }
         let completedLines: number = this.CheckIfSquareAreCompleted(lines);
- 
+        if(completedLines > 0){
+            if(this.comboN++ > 0){
+                this.comboText.string = '<color=#00ff00>Combo </color>' + '<color=#0fffff>' + this.comboN + '</color>';
+                this.comboText.node.active = true;
+                this.scheduleOnce(() => {
+                    this.comboText.node.active = false;
+                }, 3);
+            }
+        }else{
+            this.comboN = 0;
+        }
+
         let totalScore: number = 10 * completedLines;
         triggerAddScore(totalScore);
         this.CheckIsPlayerLost();
@@ -186,22 +200,18 @@ export class Grid extends Component {
         let currentShapeData = currentShape.shapeData;
         let shapeColumns: number = currentShapeData.columns;
         let shapeRows: number = currentShapeData.rows;
-       // console.log(shapeColumns + " " + shapeRows);
 
         let originalShapeFilledUpSquares: number[] = [];
         let squareIndex: number = 0;
 
         for(let rowIndex = 0; rowIndex < shapeRows; rowIndex++){
             for(let columnIndex = 0; columnIndex < shapeColumns; columnIndex++){
-                //console.log(currentShapeData.board);
                 if(currentShapeData.board[rowIndex].column[columnIndex]){
                     originalShapeFilledUpSquares.push(squareIndex);
                 }
                 squareIndex++;
             }
         }
-        //console.log(currentShape.TotalSquareNumber);
-       // console.log(originalShapeFilledUpSquares.length);
         if(currentShape.TotalSquareNumber != originalShapeFilledUpSquares.length){
             console.error("Number of filled up squares are not the same at the original shape have");
         }
