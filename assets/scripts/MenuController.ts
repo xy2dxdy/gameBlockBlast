@@ -7,9 +7,6 @@ export class MenuController extends Component {
         director.loadScene('scene');
     }
 
-    exitToMainMenu() {
-        director.loadScene('mainMenu');
-    }
 }
 
 
