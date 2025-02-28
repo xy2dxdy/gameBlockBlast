@@ -19,5 +19,6 @@
     ],
     "sleepThreshold": 0.1,
     "fixedTimeStep": 0.016
-  }
+  },
+  "custom_joint_texture_layouts": []
 }

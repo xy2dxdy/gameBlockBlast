@@ -6,10 +6,6 @@ const { ccclass, property } = _decorator;
 export class GameOverPopup extends Component {
     @property(Node)
     gameOverPopup: Node;
-    @property
-    loosePopup;
-    @property
-    score;
 
     protected start(): void {
         this.gameOverPopup.active = false;
@@ -24,9 +20,6 @@ export class GameOverPopup extends Component {
 
     private onGameOver(score: boolean){
         this.gameOverPopup.active = true;
-        this.loosePopup.active = false;
-        this.score.active = true;
-
     }
 }
 

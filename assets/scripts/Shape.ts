@@ -39,10 +39,6 @@ export class Shape extends Component {
         this.shapeDraggable = true;
         this.startPosition = new Vec3(this.node.position);
         this.shapeActive = true;
-
-
-
-
     }
     onEnable() {
         GameEvents.on(MOVE_SHAPE_TO_START_POSITION, this.moveShapeToStartPosition, this);

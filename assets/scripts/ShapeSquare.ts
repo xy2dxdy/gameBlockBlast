@@ -26,7 +26,6 @@ export class ShapeSquare extends Component {
     }
 
     onTouchStart(event: EventTouch) {
-        console.log("start");
         this.shape.node.scale = this.shape.shapeSelectedScale;
     }
 

@@ -25,6 +25,8 @@ export class Grid extends Component {
     squareScale: number = 0.5;
     @property(RichText)
     comboText: RichText = null;
+    @property(RichText)
+    comboText1: RichText = null;
 
     private offset: Vec2 = new Vec2(0, 0);
     private gridSquares: GridSquare[] = [];
@@ -40,7 +42,6 @@ export class Grid extends Component {
     start(){
         this.CreateGrid();
         this.lineIndicator = this.getComponent(LineIndicator);
-        console.log(this.lineIndicator);
     }
 
     CreateGrid(){
@@ -134,11 +135,14 @@ export class Grid extends Component {
         let completedLines: number = this.CheckIfSquareAreCompleted(lines);
         if(completedLines > 0){
             if(this.comboN++ > 0){
-                this.comboText.string = '<color=#00ff00>Combo </color>' + '<color=#0fffff>' + this.comboN + '</color>';
+                this.comboText.string = '<b>Combo ' + this.comboN + '</b>';
+                this.comboText1.string = '<b>Combo ' + this.comboN + '</b>';
                 this.comboText.node.active = true;
+                this.comboText1.node.active = true;
                 this.scheduleOnce(() => {
                     this.comboText.node.active = false;
-                }, 3);
+                    this.comboText1.node.active = false;
+                }, 4);
             }
         }else{
             this.comboN = 0;
@@ -193,7 +197,6 @@ export class Grid extends Component {
         }
         if(validShapes == 0){
             triggerGameOver(false);
-            console.log("GAME OVER");
         }
     }
     private CheckIfShapeCanBePlacedOnGrid(currentShape: Shape): boolean{
