@@ -16,19 +16,43 @@ export class GridSquare extends Component {
     Selected: Boolean;
     SquareIndex : number;
     SquareOccupied: Boolean;
+
+    collider: BoxCollider2D;
+    private colliders: BoxCollider2D[] = [];
 D
     start() {
         this.Selected = false;
         this.SquareOccupied = false;
-        let collider = this.getComponent(BoxCollider2D);
+        this.collider = this.getComponent(BoxCollider2D);
         this.animation = this.activeImage.getComponent(Animation);
         
-        if (collider) {
-            collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
-            collider.on(Contact2DType.END_CONTACT, this.onEndContact, this);
-        }
         if (this.animation) {
             this.animation.on(Animation.EventType.FINISHED, this.onAnimationFinished, this);
+        }
+
+        this.colliders = this.node.scene.getComponentsInChildren(BoxCollider2D);
+    }
+    update(deltaTime: number) {
+        if (this.collider) {
+            const worldBoundingBox = this.collider.worldAABB;
+            let isColliding = false;
+
+            const colliders = this.node.scene.getComponentsInChildren(BoxCollider2D);
+
+            for (const col of colliders) {
+                if (col !== this.collider && worldBoundingBox.intersects(col.worldAABB)) {
+                    isColliding = true;
+                    break;
+                }
+            }
+
+            if (!this.SquareOccupied && isColliding) {
+                this.Selected = true;
+                this.hooverImage.node.active = true;
+            } else {
+                this.Selected = false;
+                this.hooverImage.node.active = false;
+            }
         }
     }
 
@@ -58,20 +82,6 @@ D
         this.SquareOccupied = false;
     }
 
-    onBeginContact(selfCollider: BoxCollider2D, otherCollider: BoxCollider2D, contact: IPhysics2DContact | null) {
-        if(!this.SquareOccupied){
-            this.Selected = true;
-            this.hooverImage.node.active = true;
-        }
-
-    }
-
-    onEndContact(selfCollider: BoxCollider2D, otherCollider: BoxCollider2D, contact: IPhysics2DContact | null) {
-        if(!this.SquareOccupied){
-            this.Selected = false;
-             this.hooverImage.node.active = false;
-        }
-    }
     onAnimationFinished() {
         this.activeImage.node.active = false;
         this.activeImage.node.scale = new Vec3(1, 1, 1);
