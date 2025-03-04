@@ -11,16 +11,21 @@ export class ShapeSquare extends Component {
     protected start(): void {
         this.shape = this.node.parent.getComponent(Shape);
     }
+    
     protected onLoad(): void {
         this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
         this.node.on(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
+        this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
+        this.node.on(Node.EventType.MOUSE_UP, this.onTouchEnd, this);
     }
-    DeactivateShape(){
+
+    DeactivateShape() {
         this.getComponent(BoxCollider2D).enabled = false;
         this.node.active = false;
     }
-    ActivateShape(){
+
+    ActivateShape() {
         this.getComponent(BoxCollider2D).enabled = true;
         this.node.active = true;
     }
@@ -37,9 +42,7 @@ export class ShapeSquare extends Component {
     }
 
     onTouchEnd(event: EventTouch) {
-        this.shape.node.scale = new Vec3 (this.shape.shapeStartScale.x, this.shape.shapeStartScale.y, 1);
+        this.shape.node.scale = new Vec3(this.shape.shapeStartScale.x, this.shape.shapeStartScale.y, 1);
         GameEvents.emit(CHECK_IF_SHAPE_CAN_BE_PLACED);
     }
 }
-
-
