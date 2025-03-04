@@ -19,7 +19,7 @@ export class GridSquare extends Component {
 
     collider: BoxCollider2D;
     private colliders: BoxCollider2D[] = [];
-D
+
     start() {
         this.Selected = false;
         this.SquareOccupied = false;
